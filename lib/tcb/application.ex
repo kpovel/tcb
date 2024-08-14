@@ -7,12 +7,12 @@ defmodule Tcb.Application do
 
   @impl true
   def start(_type, _args) do
+    Tcb.Release.migrate()
+
     children = [
       TcbWeb.Telemetry,
       Tcb.Repo,
-      {Ecto.Migrator,
-        repos: Application.fetch_env!(:tcb, :ecto_repos),
-        skip: skip_migrations?()},
+      {Ecto.Migrator, repos: Application.fetch_env!(:tcb, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:tcb, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Tcb.PubSub},
       # Start the Finch HTTP client for sending emails
