@@ -14,6 +14,13 @@ defmodule TcbWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/api", TcbWeb do
+    pipe_through :api
+    # todo: unauthorized only plug
+
+    post "/signup", AuthController, :signup
+  end
+
   scope "/", TcbWeb do
     pipe_through :browser
 

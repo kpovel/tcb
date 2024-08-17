@@ -19,9 +19,9 @@ create table validate_email_codes (
 
 create table users (
     id             integer primary key autoincrement,
-    login          text not null,
+    login          text not null unique,
     nickname       text,
-    email          text not null,
+    email          text not null unique,
     validate_email integer foreign key references validate_email_codes (id),
     password       text not null,
     onboarded check (onboarded in (0, 1)),

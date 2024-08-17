@@ -8,7 +8,7 @@ defmodule Tcb.Repo.Migrations.User do
     end
 
     create table(:validate_email_codes) do
-      add :code, :integer, null: false
+      add :code, :string, null: false
       add :validated_email, :boolean, null: false, default: false
     end
 
