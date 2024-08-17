@@ -9,9 +9,16 @@ defmodule TcbWeb.AuthController do
     emailInUse = email |> User.exists_user_with_email()
     loginInUse = login |> User.exists_user_with_login()
     strongPassword = String.length(password) > 5
+    valid_email = User.validate_email(email)
 
     errors =
-      case emailInUse do
+      case valid_email do
+        false -> Map.put(errors, :email, "Invalid email")
+        true -> errors
+      end
+
+    errors =
+      case valid_email && emailInUse do
         true -> Map.put(errors, :email, "Try to use another email")
         false -> errors
       end
@@ -44,7 +51,6 @@ defmodule TcbWeb.AuthController do
             validate_email: validate_email_schema
           }
           |> Repo.insert!()
-
 
         Tcb.User.UserNotifier.deliver_confirmation_confirm_email(user)
 
