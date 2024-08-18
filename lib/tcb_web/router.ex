@@ -12,6 +12,7 @@ defmodule TcbWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug TcbWeb.Plugs.Lang, "en"
   end
 
   scope "/api", TcbWeb do

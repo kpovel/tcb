@@ -5,6 +5,7 @@ defmodule TcbWeb.AuthController do
   use TcbWeb, :controller
 
   def signup(conn, %{"login" => login, "email" => email, "password" => password}) do
+    IO.inspect(conn)
     errors = %{login: "", password: "", email: ""}
     emailInUse = email |> User.exists_user_with_email()
     loginInUse = login |> User.exists_user_with_login()
