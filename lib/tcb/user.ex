@@ -22,7 +22,7 @@ defmodule Tcb.User do
       :email,
       :password,
       :onboarded,
-      :about_me,
+      :about_me
     ])
     |> Changeset.validate_required([
       :login,
@@ -46,6 +46,26 @@ defmodule Tcb.User do
         []
       end
     end)
+  end
+
+  def valid_password(password) when not is_binary(password), do: false
+  def valid_password(password) when byte_size(password) < 6, do: false
+  def valid_password(password) when byte_size(password) > 72, do: false
+
+  def valid_password(password) do
+    cond do
+      String.contains?(password, " ") ->
+        false
+
+      !(String.to_charlist(password) |> Enum.any?(&(&1 >= 65 && &1 <= 90))) ->
+        false
+
+      !(String.to_charlist(password) |> Enum.any?(&(&1 >= 97 && &1 <= 122))) ->
+        false
+
+      true ->
+        true
+    end
   end
 
   def validate_email(email) when not is_binary(email), do: false
