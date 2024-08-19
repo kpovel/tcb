@@ -11,7 +11,22 @@
 msgid ""
 msgstr ""
 
-#: lib/tcb_web/controllers/auth_controller.ex:13
+#: lib/tcb_web/controllers/auth_controller.ex:50
 #, elixir-autogen, elixir-format
-msgid "This login is already in use, please select another one"
+msgid "Create a strong password"
+msgstr ""
+
+#: lib/tcb_web/controllers/auth_controller.ex:25
+#, elixir-autogen, elixir-format
+msgid "Email is already in use"
+msgstr ""
+
+#: lib/tcb_web/controllers/auth_controller.ex:18
+#, elixir-autogen, elixir-format
+msgid "Enter a valid email"
+msgstr ""
+
+#: lib/tcb_web/controllers/auth_controller.ex:37
+#, elixir-autogen, elixir-format
+msgid "Login is already in use"
 msgstr ""

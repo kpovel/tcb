@@ -11,7 +11,22 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100 != 11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10||n%100>=20) ? 1 : 2);\n"
 
-#: lib/tcb_web/controllers/auth_controller.ex:13
+#: lib/tcb_web/controllers/auth_controller.ex:50
 #, elixir-autogen, elixir-format
-msgid "This login is already in use, please select another one"
-msgstr "bar"
+msgid "Create a strong password"
+msgstr "Будь ласка, використовуй ABC\n Пароль має бути без пробілів, від 6 до 72 символів завдовжки і містити принаймні 1 велику літеру"
+
+#: lib/tcb_web/controllers/auth_controller.ex:25
+#, elixir-autogen, elixir-format
+msgid "Email is already in use"
+msgstr "Така пошта вже використовується, будь ласка, обери інший"
+
+#: lib/tcb_web/controllers/auth_controller.ex:18
+#, elixir-autogen, elixir-format
+msgid "Enter a valid email"
+msgstr "Будь ласка, введи дійсну адресу електронної пошти"
+
+#: lib/tcb_web/controllers/auth_controller.ex:37
+#, elixir-autogen, elixir-format
+msgid "Login is already in use"
+msgstr "Такий логін вже використовується, будь ласка, обери інший"

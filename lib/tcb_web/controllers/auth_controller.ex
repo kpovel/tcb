@@ -5,38 +5,59 @@ defmodule TcbWeb.AuthController do
   use TcbWeb, :controller
 
   def signup(conn, %{"login" => login, "email" => email, "password" => password}) do
-    IO.inspect(conn)
+    # X-Originating-Host
+
     errors = %{login: "", password: "", email: ""}
     emailInUse = email |> User.exists_user_with_email()
     loginInUse = login |> User.exists_user_with_login()
-    strongPassword = String.length(password) > 5
+    valid_password = password |> User.valid_password()
     valid_email = User.validate_email(email)
 
     errors =
       case valid_email do
-        false -> Map.put(errors, :email, "Invalid email")
+        false -> Map.put(errors, :email, TcbWeb.Gettext.dgettext("signup", "Enter a valid email"))
         true -> errors
       end
 
     errors =
       case valid_email && emailInUse do
-        true -> Map.put(errors, :email, "Try to use another email")
-        false -> errors
+        true ->
+          Map.put(errors, :email, TcbWeb.Gettext.dgettext("signup", "Email is already in use"))
+
+        false ->
+          errors
       end
 
     errors =
       case loginInUse do
-        true -> Map.put(errors, :login, "Login already in use")
-        false -> errors
+        true ->
+          Map.put(
+            errors,
+            :login,
+            TcbWeb.Gettext.dgettext("signup", "Login is already in use")
+          )
+
+        false ->
+          errors
       end
 
     errors =
-      case !strongPassword do
-        true -> Map.put(errors, :password, "Create a strong password")
-        false -> errors
+      case !valid_password do
+        true ->
+          Map.put(
+            errors,
+            :password,
+            TcbWeb.Gettext.dgettext(
+              "signup",
+              "Create a strong password"
+            )
+          )
+
+        false ->
+          errors
       end
 
-    case [emailInUse, loginInUse, strongPassword] do
+    case [emailInUse, loginInUse, valid_password] do
       [false, false, true] ->
         validate_email_schema =
           %ValidateEmailCodes{code: Ecto.UUID.generate(), validated_email: false}
