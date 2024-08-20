@@ -4,8 +4,19 @@ defmodule TcbWeb.AuthController do
   alias Tcb.User
   use TcbWeb, :controller
 
-  def signup(conn, %{"login" => login, "email" => email, "password" => password}) do
-    # X-Originating-Host
+  @originating_host "x-originating-host"
+  @default_host "http://localhost:4000"
+
+  def signup(%Plug.Conn{assigns: %{lang: lang}, req_headers: headers} = conn, %{
+        "login" => login,
+        "email" => email,
+        "password" => password
+      }) do
+    host =
+      Enum.find(headers, {@originating_host, @default_host}, fn {name, _} ->
+        name == @originating_host
+      end)
+      |> elem(1)
 
     errors = %{login: "", password: "", email: ""}
     emailInUse = email |> User.exists_user_with_email()
@@ -74,7 +85,7 @@ defmodule TcbWeb.AuthController do
           }
           |> Repo.insert!()
 
-        Tcb.User.UserNotifier.deliver_confirmation_confirm_email(user)
+        Tcb.User.UserNotifier.deliver_confirmation_confirm_email(user, lang, host)
 
         conn |> send_resp(201, "")
 

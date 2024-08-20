@@ -16,8 +16,8 @@ defmodule Tcb.User.UserNotifier do
     end
   end
 
-  def deliver_confirmation_confirm_email(%Tcb.User{} = user) do
-    link = "http://localhost:4000/en/validate-email/#{user.validate_email.code}"
+  def deliver_confirmation_confirm_email(%Tcb.User{} = user, lang, host) do
+    link = "#{host}/#{lang}/validate-email/#{user.validate_email.code}"
 
     deliver(user.email, "Confirmation instructions", """
 
