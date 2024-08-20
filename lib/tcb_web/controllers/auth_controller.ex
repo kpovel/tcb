@@ -21,6 +21,7 @@ defmodule TcbWeb.AuthController do
     errors = %{login: "", password: "", email: ""}
     emailInUse = email |> User.exists_user_with_email()
     loginInUse = login |> User.exists_user_with_login()
+    valid_login = login |> User.valid_login()
     valid_password = password |> User.valid_password()
     valid_email = User.validate_email(email)
 
@@ -31,7 +32,7 @@ defmodule TcbWeb.AuthController do
       end
 
     errors =
-      case valid_email && emailInUse do
+      case emailInUse do
         true ->
           Map.put(errors, :email, TcbWeb.Gettext.dgettext("signup", "Email is already in use"))
 
@@ -49,6 +50,19 @@ defmodule TcbWeb.AuthController do
           )
 
         false ->
+          errors
+      end
+
+    errors =
+      case valid_login do
+        false ->
+          Map.put(
+            errors,
+            :login,
+            TcbWeb.Gettext.dgettext("signup", "Enter a valid login")
+          )
+
+        true ->
           errors
       end
 

@@ -48,6 +48,18 @@ defmodule Tcb.User do
     end)
   end
 
+  @doc """
+    Validate login and nicknames
+  """
+  def valid_login(password) when not is_binary(password), do: false
+  def valid_login(password) when byte_size(password) < 3, do: false
+  def valid_login(password) when byte_size(password) > 50, do: false
+
+  def valid_login(password) do
+    String.to_charlist(password)
+    |> Enum.all?(&((&1 >= 65 && &1 <= 90) || (&1 >= 97 && &1 <= 122)))
+  end
+
   def valid_password(password) when not is_binary(password), do: false
   def valid_password(password) when byte_size(password) < 6, do: false
   def valid_password(password) when byte_size(password) > 72, do: false
