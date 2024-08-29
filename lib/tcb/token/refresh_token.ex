@@ -2,8 +2,8 @@ defmodule Tcb.RefreshToken do
   use Ecto.Schema
 
   schema "refresh_tokens" do
-    belongs_to :user_id, Tcb.User
-    field :token, :string
-    field :expired_at, :date
+    belongs_to :user, Tcb.User
+    field :token, :binary
+    field :expired_at, :utc_datetime
   end
 end
