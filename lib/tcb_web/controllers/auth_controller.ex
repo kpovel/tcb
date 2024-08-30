@@ -1,7 +1,10 @@
 defmodule TcbWeb.AuthController do
+  alias Tcb.AccessToken
+  alias Tcb.RefreshToken
   alias Tcb.Repo
   alias Tcb.ValidateEmailCodes
   alias Tcb.User
+  import Ecto.Query
   use TcbWeb, :controller
 
   @originating_host "x-originating-host"
@@ -110,5 +113,38 @@ defmodule TcbWeb.AuthController do
 
   def signup(conn, _params) do
     conn |> send_resp(400, "")
+  end
+
+  def validate_email(conn, %{"code" => code}) do
+    Tcb.ValidateEmailCodes
+    |> where([e], e.code == ^code)
+    |> select([:code, :id, :validated_email])
+    |> Repo.one()
+    |> case do
+      nil ->
+        conn |> send_resp(400, "Something went wrong")
+
+      %Tcb.ValidateEmailCodes{validated_email: true} ->
+        conn |> send_resp(400, "Email was already validated")
+
+      %Tcb.ValidateEmailCodes{id: validate_email_id} ->
+        Repo.query!(
+          "update validate_email_codes set validated_email = true where id = $1",
+          [validate_email_id]
+        )
+
+        %Tcb.User{id: user_id} =
+          from(Tcb.User,
+            where: [validate_email_id: ^validate_email_id],
+            select: [:id]
+          )
+          |> Repo.one()
+
+        {refresh_token, token_id} = RefreshToken.issue_refresh_token(user_id)
+        access_token = AccessToken.issue_access_token(token_id)
+
+        conn
+        |> render(:validate_email, %{refresh_token: refresh_token, access_token: access_token})
+    end
   end
 end

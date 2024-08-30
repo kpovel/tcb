@@ -7,7 +7,7 @@ defmodule Tcb.ValidateEmailCodes do
     field :validated_email, :boolean, default: false
   end
 
-  def changeset(emailCodes, params) do
+  def changeset(emailCodes, params \\ %{}) do
     emailCodes
     |> cast(params, [:code, :validated_email])
     |> validate_required([:code])

@@ -20,6 +20,7 @@ defmodule TcbWeb.Router do
     # todo: unauthorized only plug
 
     post "/signup", AuthController, :signup
+    put "/validate-email/:code", AuthController, :validate_email
   end
 
   scope "/", TcbWeb do
@@ -27,11 +28,6 @@ defmodule TcbWeb.Router do
 
     get "/", PageController, :home
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", TcbWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:tcb, :dev_routes) do
