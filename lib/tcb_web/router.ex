@@ -21,6 +21,9 @@ defmodule TcbWeb.Router do
 
     post "/signup", AuthController, :signup
     put "/validate-email/:code", AuthController, :validate_email
+
+    post "/refresh/access-token", TokenController, :access_token
+    # post "/refresh/refresh-token", TokenController, :refresh_token
   end
 
   scope "/", TcbWeb do
