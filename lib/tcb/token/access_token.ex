@@ -15,6 +15,7 @@ defmodule Tcb.AccessToken do
 
   def issue_access_token(refresh_token_id) do
     token = Token.generate_token()
+    Repo.query!("delete from access_tokens where refresh_token_id = $1;", [refresh_token_id])
 
     expired_at =
       DateTime.utc_now()
@@ -29,7 +30,6 @@ defmodule Tcb.AccessToken do
 
   def validate_token(token) do
     token = token |> Token.decode_token()
-    now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Tcb.AccessToken
     |> where([t], t.token == ^token)
@@ -39,12 +39,17 @@ defmodule Tcb.AccessToken do
       nil ->
         false
 
-      %Tcb.AccessToken{id: id, expired_at: expired_at} when expired_at < now ->
-        Repo.query!("delete from access_tokens where id = $1;", [id])
-        false
+      %Tcb.AccessToken{id: id, expired_at: expired_at} ->
+        now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-      %Tcb.RefreshToken{} ->
-        true
+        case DateTime.compare(expired_at, now) do
+          :gt ->
+            {true, id}
+
+          _ ->
+            Repo.query!("delete from access_tokens where id = $1;", [id])
+            false
+        end
     end
   end
 end

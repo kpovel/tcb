@@ -30,7 +30,6 @@ defmodule Tcb.RefreshToken do
 
   def validate_token(token) do
     token = token |> Token.decode_token()
-    now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Tcb.RefreshToken
     |> where([t], t.token == ^token)
@@ -40,14 +39,18 @@ defmodule Tcb.RefreshToken do
       nil ->
         false
 
-      %Tcb.RefreshToken{id: id, expired_at: expired_at} when expired_at < now ->
-        Repo.query!("delete from access_tokens where refresh_token_id = $1;", [id])
-        Repo.query!("delete from refresh_tokens where id = $1;", [id])
+      %Tcb.RefreshToken{id: id, expired_at: expired_at} ->
+        now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-        false
+        case DateTime.compare(expired_at, now) do
+          :gt ->
+            {true, id}
 
-      %Tcb.RefreshToken{} ->
-        true
+          _ ->
+            Repo.query!("delete from access_tokens where refresh_token_id = $1;", [id])
+            Repo.query!("delete from refresh_tokens where id = $1;", [id])
+            false
+        end
     end
   end
 end
