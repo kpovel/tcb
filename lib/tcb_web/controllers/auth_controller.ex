@@ -96,7 +96,7 @@ defmodule TcbWeb.AuthController do
             login: login,
             nickname: login,
             email: email,
-            password: password,
+            password: Bcrypt.hash_pwd_salt(password),
             onboarded: false,
             validate_email: validate_email_schema
           }
