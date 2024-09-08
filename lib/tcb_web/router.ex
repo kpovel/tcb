@@ -12,6 +12,18 @@ defmodule TcbWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug TcbWeb.Plugs.Lang, "en"
+  end
+
+  scope "/api", TcbWeb do
+    pipe_through :api
+    # todo: unauthorized only plug
+
+    post "/signup", AuthController, :signup
+    put "/validate-email/:code", AuthController, :validate_email
+
+    post "/refresh/access-token", TokenController, :access_token
+    # post "/refresh/refresh-token", TokenController, :refresh_token
   end
 
   scope "/", TcbWeb do
@@ -19,11 +31,6 @@ defmodule TcbWeb.Router do
 
     get "/", PageController, :home
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", TcbWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:tcb, :dev_routes) do
