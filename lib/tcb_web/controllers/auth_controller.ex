@@ -103,6 +103,7 @@ defmodule TcbWeb.AuthController do
           |> Repo.insert!()
 
         Tcb.User.UserNotifier.deliver_confirmation_confirm_email(user, lang, host)
+        |> IO.inspect()
 
         conn |> send_resp(201, "")
 

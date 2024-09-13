@@ -1,15 +1,15 @@
 defmodule Tcb.User.UserNotifier do
-  import Swoosh.Email
   alias Tcb.Mailer
+  import Swoosh.Email
 
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
     email =
       new()
       |> to(recipient)
-      |> from({"Tereveni", "chat.creators.01@gmail.com"})
+      |> from({"Tereveni", "no_replay@tereveni.software"})
       |> subject(subject)
-      |> text_body(body)
+      |> html_body(body)
 
     with {:ok, _metadata} <- Mailer.deliver(email) do
       {:ok, email}
@@ -20,20 +20,16 @@ defmodule Tcb.User.UserNotifier do
     link = "#{host}/#{lang}/validate-email/#{user.validate_email.code}"
 
     deliver(user.email, "Confirmation instructions", """
-
-    ==============================
-
-    Hi #{user.nickname},
-
-    You can confirm your email account by visiting the URL below:
-
-    <a href="#{link}">
-      #{link}
-    </a>
-
-    If you didn't create an account with us, please ignore this.
-
-    ==============================
+    <p>==============================</p>
+    <h1>Hi #{user.nickname},</h1>
+    <p>
+      You can confirm your email account by visiting the URL below:
+    </p>
+    <p><a href="#{link}">#{link}</a></p>
+    <p>
+      If you didn't create an account with us, please ignore this.
+    </p>
+    <p>==============================</p>
     """)
   end
 end

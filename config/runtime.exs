@@ -61,6 +61,15 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :tcb, Tcb.Mailer,
+    adapter: Resend.Swoosh.Adapter,
+    api_key:
+      System.get_env("RESEND_KEY") ||
+        raise("""
+        environment variable RESEND_KEY is missing.
+        For example: re_123456789
+        """)
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
