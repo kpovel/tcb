@@ -42,6 +42,7 @@ defmodule TcbWeb.Router do
     pipe_through :authorized_api
 
     get "/onboarding/get-user", UserController, :onboarding_data
+    put "/user-about-with-onboarding/save", UserController, :put_user_about
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

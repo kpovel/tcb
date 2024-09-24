@@ -11,27 +11,27 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: lib/tcb_web/controllers/auth_controller.ex:75
+#: lib/tcb_web/controllers/auth_controller.ex:78
 #, elixir-autogen, elixir-format
 msgid "Create a strong password"
 msgstr "Please use ABC\n Password must be without spaces, 6 to 72 characters and contain at least 1 capital letter"
 
-#: lib/tcb_web/controllers/auth_controller.ex:37
+#: lib/tcb_web/controllers/auth_controller.ex:40
 #, elixir-autogen, elixir-format
 msgid "Email is already in use"
 msgstr "This email is already in use, please select another one"
 
-#: lib/tcb_web/controllers/auth_controller.ex:30
+#: lib/tcb_web/controllers/auth_controller.ex:33
 #, elixir-autogen, elixir-format
 msgid "Enter a valid email"
 msgstr "Please enter a valid email address"
 
-#: lib/tcb_web/controllers/auth_controller.ex:49
+#: lib/tcb_web/controllers/auth_controller.ex:52
 #, elixir-autogen, elixir-format
 msgid "Login is already in use"
 msgstr "This login is already in use, please select another one"
 
-#: lib/tcb_web/controllers/auth_controller.ex:62
+#: lib/tcb_web/controllers/auth_controller.ex:65
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Enter a valid login"
 msgstr "Please enter a valid login address"
