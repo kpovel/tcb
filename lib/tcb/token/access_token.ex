@@ -52,4 +52,45 @@ defmodule Tcb.AccessToken do
         end
     end
   end
+
+  @spec user_by_access_token_id(integer()) :: %Tcb.User{} | nil
+  def user_by_access_token_id(access_token_id) do
+    %{rows: rows} =
+      Repo.query!(
+        "select u.id,
+       u.login,
+       u.nickname,
+       u.email,
+       u.validate_email_id,
+       u.password,
+       u.onboarded,
+       u.avatar_id,
+       u.about_me
+from access_tokens ac
+         inner join refresh_tokens rt on rt.id = ac.refresh_token_id
+         inner join users u on rt.user_id = u.id
+where ac.id = ?1",
+        [access_token_id]
+      )
+
+    user = rows |> Enum.at(0)
+
+    case user do
+      nil ->
+        nil
+
+      [id, login, nickname, email, validate_email_id, password, onboarded, avatar_id, about_me] ->
+        %Tcb.User{
+          id: id,
+          login: login,
+          nickname: nickname,
+          email: email,
+          validate_email_id: validate_email_id,
+          password: password,
+          onboarded: onboarded,
+          avatar_id: avatar_id,
+          about_me: about_me
+        }
+    end
+  end
 end

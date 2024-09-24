@@ -15,6 +15,18 @@ defmodule TcbWeb.Router do
     plug TcbWeb.Plugs.Lang, "en"
   end
 
+  pipeline :authorized_api do
+    plug :accepts, ["json"]
+    plug TcbWeb.Plugs.Lang, "en"
+    plug TcbWeb.Plugs.AuthorizedOnly
+  end
+
+  scope "/", TcbWeb do
+    pipe_through :browser
+
+    get "/", PageController, :home
+  end
+
   scope "/api", TcbWeb do
     pipe_through :api
     # todo: unauthorized only plug
@@ -26,10 +38,10 @@ defmodule TcbWeb.Router do
     # post "/refresh/refresh-token", TokenController, :refresh_token
   end
 
-  scope "/", TcbWeb do
-    pipe_through :browser
+  scope "/api/user", TcbWeb do
+    pipe_through :authorized_api
 
-    get "/", PageController, :home
+    get "/onboarding/get-user", UserController, :onboarding_data
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
