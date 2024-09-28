@@ -108,7 +108,9 @@ defmodule TcbWeb.AuthController do
         conn |> send_resp(201, "")
 
       _ ->
-        conn |> render(:signup, errors)
+        conn
+        |> put_status(400)
+        |> render(:signup, errors)
     end
   end
 
