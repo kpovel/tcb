@@ -11,7 +11,7 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: lib/tcb_web/controllers/user_controller.ex:28
+#: lib/tcb_web/controllers/user_controller.ex:44
 #, elixir-autogen, elixir-format
 msgid "About me field is too long"
 msgstr "About me field is too long"

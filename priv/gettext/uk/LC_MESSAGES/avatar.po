@@ -11,7 +11,12 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100 != 11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10||n%100>=20) ? 1 : 2);\n"
 
-#: lib/tcb_web/controllers/user_controller.ex:44
+#: lib/tcb_web/controllers/avatar_controller.ex:82
 #, elixir-autogen, elixir-format
-msgid "About me field is too long"
-msgstr "Задовге поле"
+msgid "Image size exceeds limit"
+msgstr "Розмір зображення перевищує обмеження\nБудь ласка, завантаж фото розміром до 3 МБ"
+
+#: lib/tcb_web/controllers/avatar_controller.ex:73
+#, elixir-autogen, elixir-format
+msgid "Image type not allowed"
+msgstr "Тип зображення не дозволено"

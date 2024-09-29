@@ -3,6 +3,9 @@ defmodule TcbWeb.AvatarController do
   import Ecto.Query
   alias Tcb.Repo
 
+  @max_avatar_size_byte 3_000_000
+  @allowed_avatar_content_type ["image/jpeg", "image/png", "image/webp", "image/jpg"]
+
   def default_avatars(%Plug.Conn{} = conn, _params) do
     avatars =
       from(Tcb.Image,
@@ -62,24 +65,42 @@ defmodule TcbWeb.AvatarController do
   def put_avatar(%Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn, %{
         "image" => %Plug.Upload{} = image
       }) do
-    # todo: 3mb file limit
+    case image.content_type in @allowed_avatar_content_type do
+      false ->
+        conn
+        |> send_resp(
+          400,
+          TcbWeb.Gettext.dgettext("avatar", "Image type not allowed")
+        )
 
-    Repo.transaction(fn ->
-      %Tcb.Image{id: image_id} =
-        %Tcb.Image{
-          name: Ecto.UUID.generate() <> Path.extname(image.filename),
-          value: File.read!(image.path),
-          default_avatar: false
-        }
-        |> Repo.insert!()
+      true ->
+        case File.stat!(image.path) do
+          %File.Stat{size: size} when size > @max_avatar_size_byte ->
+            conn
+            |> send_resp(
+              400,
+              TcbWeb.Gettext.dgettext("avatar", "Image size exceeds limit")
+            )
 
-      from(Tcb.User,
-        where: [id: ^user.id],
-        update: [set: [avatar_id: ^image_id]]
-      )
-      |> Repo.update_all([])
-    end)
+          _ ->
+            Repo.transaction(fn ->
+              %Tcb.Image{id: image_id} =
+                %Tcb.Image{
+                  name: Ecto.UUID.generate() <> Path.extname(image.filename),
+                  value: File.read!(image.path),
+                  default_avatar: false
+                }
+                |> Repo.insert!()
 
-    conn |> send_resp(200, "")
+              from(Tcb.User,
+                where: [id: ^user.id],
+                update: [set: [avatar_id: ^image_id]]
+              )
+              |> Repo.update_all([])
+            end)
+
+            conn |> send_resp(200, "")
+        end
+    end
   end
 end

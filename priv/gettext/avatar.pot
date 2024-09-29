@@ -11,7 +11,12 @@
 msgid ""
 msgstr ""
 
-#: lib/tcb_web/controllers/user_controller.ex:44
+#: lib/tcb_web/controllers/avatar_controller.ex:82
 #, elixir-autogen, elixir-format
-msgid "About me field is too long"
+msgid "Image size exceeds limit"
+msgstr ""
+
+#: lib/tcb_web/controllers/avatar_controller.ex:73
+#, elixir-autogen, elixir-format
+msgid "Image type not allowed"
 msgstr ""
