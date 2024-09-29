@@ -39,4 +39,23 @@ defmodule TcbWeb.AvatarController do
         |> send_resp(200, value)
     end
   end
+
+  def put_default_avatar(%Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn, %{
+        "onboardingFieldStr" => default_avatar_name
+      }) do
+    avatar_subquery =
+      from(Tcb.Image,
+        where: [name: ^default_avatar_name, default_avatar: true],
+        select: [:id]
+      )
+
+    from(Tcb.User,
+      join: avatar in subquery(avatar_subquery),
+      where: [id: ^user.id],
+      update: [set: [avatar_id: avatar.id]]
+    )
+    |> Repo.update_all([])
+
+    conn |> send_resp(200, "")
+  end
 end

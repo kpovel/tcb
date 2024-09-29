@@ -39,9 +39,11 @@ defmodule TcbWeb.Router do
   end
 
   scope "/api", TcbWeb do
-    pipe_through :api
+    pipe_through :authorized_api
     get "/default-avatars", AvatarController, :default_avatars
     get "/user-image/:name", AvatarController, :avatar
+
+    put "/user/default-avatar-with-onboarding/save", AvatarController, :put_default_avatar
   end
 
   scope "/api/user", TcbWeb do
