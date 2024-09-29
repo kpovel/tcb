@@ -38,6 +38,12 @@ defmodule TcbWeb.Router do
     # post "/refresh/refresh-token", TokenController, :refresh_token
   end
 
+  scope "/api", TcbWeb do
+    pipe_through :api
+    get "/default-avatars", AvatarController, :default_avatars
+    get "/user-image/:name", AvatarController, :avatar
+  end
+
   scope "/api/user", TcbWeb do
     pipe_through :authorized_api
 
