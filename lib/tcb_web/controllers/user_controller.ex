@@ -1,7 +1,8 @@
 defmodule TcbWeb.UserController do
+  use TcbWeb, :controller
   alias Tcb.User
   alias Tcb.Repo
-  use TcbWeb, :controller
+  import Ecto.Query
 
   def onboarding_data(%Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn, _params) do
     onboarded =
@@ -10,14 +11,24 @@ defmodule TcbWeb.UserController do
         1 -> true
       end
 
+    avatar_name =
+      from(Tcb.Image,
+        where: [id: ^user.avatar_id],
+        select: [:name]
+      )
+      |> Repo.one()
+      |> case do
+        nil -> nil
+        %Tcb.Image{name: name} -> name
+      end
+
     conn
     |> render(:onboarding_data, %{
       data: %{
         name: user.nickname,
         userLogin: user.login,
         onboardingEnd: onboarded,
-        # todo: avatar name
-        image: %{name: user.avatar_id}
+        image: %{name: avatar_name}
       }
     })
   end
