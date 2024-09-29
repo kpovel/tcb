@@ -26,7 +26,7 @@ defmodule TcbWeb.AvatarController do
         conn |> send_resp(404, "")
 
       %Tcb.Image{value: value} ->
-        [_, file_extension] = String.split(name, ".")
+        "." <> file_extension = Path.extname(name)
 
         content_type =
           case file_extension do
@@ -55,6 +55,30 @@ defmodule TcbWeb.AvatarController do
       update: [set: [avatar_id: avatar.id]]
     )
     |> Repo.update_all([])
+
+    conn |> send_resp(200, "")
+  end
+
+  def put_avatar(%Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn, %{
+        "image" => %Plug.Upload{} = image
+      }) do
+    # todo: 3mb file limit
+
+    Repo.transaction(fn ->
+      %Tcb.Image{id: image_id} =
+        %Tcb.Image{
+          name: Ecto.UUID.generate() <> Path.extname(image.filename),
+          value: File.read!(image.path),
+          default_avatar: false
+        }
+        |> Repo.insert!()
+
+      from(Tcb.User,
+        where: [id: ^user.id],
+        update: [set: [avatar_id: ^image_id]]
+      )
+      |> Repo.update_all([])
+    end)
 
     conn |> send_resp(200, "")
   end

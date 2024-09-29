@@ -44,6 +44,7 @@ defmodule TcbWeb.Router do
     get "/user-image/:name", AvatarController, :avatar
 
     put "/user/default-avatar-with-onboarding/save", AvatarController, :put_default_avatar
+    post "/user/avatar/upload", AvatarController, :put_avatar
   end
 
   scope "/api/user", TcbWeb do
