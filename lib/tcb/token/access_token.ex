@@ -15,7 +15,6 @@ defmodule Tcb.AccessToken do
 
   def issue_access_token(refresh_token_id) do
     token = Token.generate_token()
-    Repo.query!("delete from access_tokens where refresh_token_id = $1;", [refresh_token_id])
 
     expired_at =
       DateTime.utc_now()
