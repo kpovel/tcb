@@ -55,6 +55,7 @@ defmodule TcbWeb.Router do
 
     get "/onboarding/get-user", UserController, :onboarding_data
     put "/user-about-with-onboarding/save", UserController, :put_user_about
+    put "/onboarding/end", UserController, :end_onboarding
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

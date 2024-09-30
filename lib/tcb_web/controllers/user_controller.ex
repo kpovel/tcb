@@ -49,4 +49,12 @@ defmodule TcbWeb.UserController do
         conn |> send_resp(200, "")
     end
   end
+
+  def end_onboarding(%Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn, %{
+        "onboardingEnd" => true
+      }) do
+    user |> User.changeset(%{onboarded: true}) |> Repo.update!()
+
+    conn |> send_resp(200, "")
+  end
 end
