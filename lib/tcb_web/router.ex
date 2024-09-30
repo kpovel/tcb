@@ -45,6 +45,9 @@ defmodule TcbWeb.Router do
 
     put "/user/default-avatar-with-onboarding/save", AvatarController, :put_default_avatar
     post "/user/avatar/upload", AvatarController, :put_avatar
+
+    get "/hashtags-group/all-hashtags-locale", HashtagController, :index
+    put "/user/hashtags-with-onboarding/save", HashtagController, :put_hashtags
   end
 
   scope "/api/user", TcbWeb do
