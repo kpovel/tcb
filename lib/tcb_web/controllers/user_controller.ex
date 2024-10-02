@@ -12,14 +12,20 @@ defmodule TcbWeb.UserController do
       end
 
     avatar_name =
-      from(Tcb.Image,
-        where: [id: ^user.avatar_id],
-        select: [:name]
-      )
-      |> Repo.one()
-      |> case do
-        nil -> nil
-        %Tcb.Image{name: name} -> name
+      case user.avatar_id do
+        nil ->
+          nil
+
+        avatar_id ->
+          from(Tcb.Image,
+            where: [id: ^avatar_id],
+            select: [:name]
+          )
+          |> Repo.one()
+          |> case do
+            nil -> nil
+            %Tcb.Image{name: name} -> name
+          end
       end
 
     conn
