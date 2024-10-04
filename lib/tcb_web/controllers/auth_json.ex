@@ -10,8 +10,4 @@ defmodule TcbWeb.AuthJSON do
   def login_error(%{general: general}) do
     %{general: general}
   end
-
-  def forgot_password_error(%{error: error}) do
-
-  end
 end
