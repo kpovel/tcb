@@ -63,4 +63,12 @@ defmodule TcbWeb.UserController do
 
     conn |> send_resp(200, "")
   end
+
+  def new_password(%Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn, %{
+        "userPassword" => new_password
+      }) do
+    user |> User.changeset(%{password: Bcrypt.hash_pwd_salt(new_password)}) |> Repo.update!()
+
+    conn |> send_resp(200, "")
+  end
 end

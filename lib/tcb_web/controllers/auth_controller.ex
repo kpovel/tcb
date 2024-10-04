@@ -103,7 +103,6 @@ defmodule TcbWeb.AuthController do
           |> Repo.insert!()
 
         Tcb.User.UserNotifier.deliver_confirmation_confirm_email(user, lang, host)
-        |> IO.inspect()
 
         conn |> send_resp(201, "")
 
@@ -156,6 +155,68 @@ defmodule TcbWeb.AuthController do
               %{refresh_token: refresh_token, access_token: access_token}
             )
         end
+    end
+  end
+
+  def forgot_password(%Plug.Conn{assigns: %{lang: lang}, req_headers: headers} = conn, %{
+        "userEmail" => email
+      }) do
+    host =
+      Enum.find(headers, {@originating_host, @default_host}, fn {name, _} ->
+        name == @originating_host
+      end)
+      |> elem(1)
+
+    from(Tcb.User,
+      where: [email: ^email],
+      select: [:id, :email, :nickname]
+    )
+    |> Repo.one()
+    |> case do
+      nil ->
+        conn
+        |> send_resp(
+          401,
+          TcbWeb.Gettext.dgettext("reset_password", "You have entered an incorrect email")
+        )
+
+      %Tcb.User{id: user_id} = user ->
+        from(r in Tcb.ResetPasswordCodes,
+          where: r.user_id == ^user_id
+        )
+        |> Repo.delete_all()
+
+        %Tcb.ResetPasswordCodes{code: code} =
+          %Tcb.ResetPasswordCodes{user_id: user_id, code: Ecto.UUID.generate()}
+          |> Repo.insert!()
+
+        Tcb.User.UserNotifier.deliver_reset_password_email(user, code, lang, host)
+
+        conn |> send_resp(201, "")
+    end
+  end
+
+  def forgot_password_code(%Plug.Conn{} = conn, %{"code" => code}) do
+    from(Tcb.ResetPasswordCodes,
+      where: [code: ^code]
+    )
+    |> Repo.one()
+    |> case do
+      nil ->
+        conn
+        |> send_resp(401, "You did not initiate this password reset")
+
+      %Tcb.ResetPasswordCodes{user_id: user_id} ->
+        from(r in Tcb.ResetPasswordCodes,
+          where: r.user_id == ^user_id
+        )
+        |> Repo.delete_all()
+
+        {refresh_token, token_id} = RefreshToken.issue_refresh_token(user_id)
+        access_token = AccessToken.issue_access_token(token_id)
+
+        conn
+        |> render(:validate_email, %{refresh_token: refresh_token, access_token: access_token})
     end
   end
 

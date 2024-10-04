@@ -35,6 +35,9 @@ defmodule TcbWeb.Router do
     post "/login", AuthController, :login
     put "/validate-email/:code", AuthController, :validate_email
 
+    put "/forgot-password", AuthController, :forgot_password
+    put "/forgot-password/:code", AuthController, :forgot_password_code
+
     post "/refresh/access-token", TokenController, :access_token
     # post "/refresh/refresh-token", TokenController, :refresh_token
   end
@@ -57,6 +60,7 @@ defmodule TcbWeb.Router do
     get "/onboarding/get-user", UserController, :onboarding_data
     put "/user-about-with-onboarding/save", UserController, :put_user_about
     put "/onboarding/end", UserController, :end_onboarding
+    put "/new-password/save", UserController, :new_password
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

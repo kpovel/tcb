@@ -32,4 +32,21 @@ defmodule Tcb.User.UserNotifier do
     <p>==============================</p>
     """)
   end
+
+  def deliver_reset_password_email(user, reset_password_code, lang, host) do
+    link = "#{host}/#{lang}/restore-password/#{reset_password_code}"
+
+    deliver(user.email, "Reset password instructions", """
+    <p>==============================</p>
+    <h1>Hi #{user.nickname},</h1>
+    <p>
+      To reset your password follow this link:
+    </p>
+    <p><a href="#{link}">#{link}</a></p>
+    <p>
+      If you did not initiate the password reset, please ignore this email.
+    </p>
+    <p>==============================</p>
+    """)
+  end
 end
