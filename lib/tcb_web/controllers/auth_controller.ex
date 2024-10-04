@@ -118,6 +118,47 @@ defmodule TcbWeb.AuthController do
     conn |> send_resp(400, "")
   end
 
+  def login(%Plug.Conn{} = conn, %{"email" => email, "password" => password}) do
+    from(Tcb.User,
+      where: [email: ^email],
+      select: [:id, :password]
+    )
+    |> Repo.one()
+    |> case do
+      nil ->
+        conn
+        |> put_status(400)
+        |> render(:login_error, %{
+          general:
+            TcbWeb.Gettext.dgettext("login", "You have entered an incorrect email or password")
+        })
+
+      %Tcb.User{id: user_id, password: hashed_password} ->
+        case Bcrypt.verify_pass(password, hashed_password) do
+          false ->
+            conn
+            |> put_status(400)
+            |> render(:login_error, %{
+              general:
+                TcbWeb.Gettext.dgettext(
+                  "login",
+                  "You have entered an incorrect email or password"
+                )
+            })
+
+          true ->
+            {refresh_token, token_id} = RefreshToken.issue_refresh_token(user_id)
+            access_token = AccessToken.issue_access_token(token_id)
+
+            conn
+            |> render(
+              :validate_email,
+              %{refresh_token: refresh_token, access_token: access_token}
+            )
+        end
+    end
+  end
+
   def validate_email(conn, %{"code" => code}) do
     Tcb.ValidateEmailCodes
     |> where([e], e.code == ^code)

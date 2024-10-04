@@ -32,6 +32,7 @@ defmodule TcbWeb.Router do
     # todo: unauthorized only plug
 
     post "/signup", AuthController, :signup
+    post "/login", AuthController, :login
     put "/validate-email/:code", AuthController, :validate_email
 
     post "/refresh/access-token", TokenController, :access_token

@@ -11,7 +11,8 @@
 msgid ""
 msgstr ""
 
-#: lib/tcb_web/controllers/user_controller.ex:50
+#: lib/tcb_web/controllers/auth_controller.ex:132
+#: lib/tcb_web/controllers/auth_controller.ex:141
 #, elixir-autogen, elixir-format
-msgid "About me field is too long"
+msgid "You have entered an incorrect email or password"
 msgstr ""

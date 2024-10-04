@@ -6,4 +6,8 @@ defmodule TcbWeb.AuthJSON do
   def validate_email(%{access_token: access_token, refresh_token: refresh_token}) do
     %{jwtAccessToken: access_token, jwtRefreshToken: refresh_token}
   end
+
+  def login_error(%{general: general}) do
+    %{general: general}
+  end
 end
