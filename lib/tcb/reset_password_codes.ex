@@ -1,7 +1,6 @@
 defmodule Tcb.ResetPasswordCodes do
   use Ecto.Schema
   alias Ecto.Changeset
-  import Ecto.Query
 
   schema "reset_password_codes" do
     field :code, :string
