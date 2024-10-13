@@ -8,6 +8,7 @@ defmodule TcbWeb.Router do
     plug :put_root_layout, html: {TcbWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug TcbWeb.Plugs.RemoveXFrameOptions
   end
 
   pipeline :api do
@@ -25,6 +26,14 @@ defmodule TcbWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  scope "/chat", TcbWeb do
+    pipe_through [:browser]
+
+    live_session :asdf, layout: false do
+      live "/all", ChatLive
+    end
   end
 
   scope "/api", TcbWeb do
