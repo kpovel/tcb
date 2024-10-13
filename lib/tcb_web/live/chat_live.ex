@@ -21,6 +21,7 @@ defmodule TcbWeb.ChatLive do
   end
 
   def mount(_params, _session, socket) do
+    # todo: personal chat list view for the user
     if LiveView.connected?(socket), do: Endpoint.subscribe("room")
     {:ok, socket |> assign(:count, 0)}
   end
