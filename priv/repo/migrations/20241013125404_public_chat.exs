@@ -4,7 +4,7 @@ defmodule Tcb.Repo.Migrations.PublicChat do
   def change do
     create table(:public_chats) do
       add :name, :string, null: false
-      add :description, :string, null: false
+      add :description, :string
       add :uuid, :string, null: false
       add :image_id, references(:image)
       add :hashtag_id, references(:hashtags)

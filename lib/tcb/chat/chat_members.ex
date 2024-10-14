@@ -3,8 +3,8 @@ defmodule Tcb.Chat.ChatMembers do
   import Ecto.Changeset
 
   schema "chat_members" do
-    has_one :chat, Tcb.Chat.PublicChat
-    has_one :user, Tcb.User
+    belongs_to :chat, Tcb.Chat.PublicChat
+    belongs_to :user, Tcb.User
     field :owner, :boolean
 
     timestamps()

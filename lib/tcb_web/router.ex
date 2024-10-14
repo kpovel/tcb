@@ -31,9 +31,15 @@ defmodule TcbWeb.Router do
   scope "/chat", TcbWeb do
     pipe_through [:browser]
 
-    live_session :asdf, layout: false do
+    live_session :chat, layout: false do
       live "/all", ChatLive
     end
+  end
+
+  scope "/api", TcbWeb do
+    pipe_through :authorized_api
+
+    post "/public-chat-room/create", PublicChatController, :create
   end
 
   scope "/api", TcbWeb do
