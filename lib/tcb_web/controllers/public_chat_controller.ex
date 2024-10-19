@@ -3,6 +3,7 @@ defmodule TcbWeb.PublicChatController do
   alias Tcb.Chat.PublicChat
   alias Tcb.Repo
   use TcbWeb, :controller
+  import Ecto.Query
 
   @max_avatar_size_byte 3_000_000
   @allowed_avatar_content_type ["image/jpeg", "image/png", "image/webp", "image/jpg"]
@@ -97,5 +98,67 @@ defmodule TcbWeb.PublicChatController do
     |> Repo.insert!()
 
     conn |> render(:create, %{uuid: chat_uuid})
+  end
+
+  def chat_owner(
+        %Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn,
+        %{"uuid" => chat_uuid}
+      ) do
+    PublicChat.chat_owner(chat_uuid, user.id)
+    |> case do
+      true -> conn |> send_resp(200, "")
+      false -> conn |> send_resp(400, "")
+    end
+  end
+
+  def put_hashtags(
+        %Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn,
+        %{"uuid" => chat_uuid, "hashtag" => %{"id" => hashtag_id}}
+      ) do
+    from(Tcb.Hashtag,
+      where: [id: ^hashtag_id],
+      select: [:id]
+    )
+    |> Repo.one!()
+
+    {:ok, conn} =
+      Repo.transaction(fn ->
+        PublicChat.chat_owner(chat_uuid, user.id)
+        |> case do
+          false ->
+            conn |> send_resp(400, "")
+
+          true ->
+            from(PublicChat,
+              where: [uuid: ^chat_uuid],
+              update: [set: [hashtag_id: ^hashtag_id]]
+            )
+            |> Repo.update_all([])
+
+            conn |> send_resp(200, "")
+        end
+      end)
+
+    conn
+  end
+
+  def put_description(
+        %Plug.Conn{assigns: %{user: %Tcb.User{} = user}} = conn,
+        %{"uuid" => chat_uuid, "chatRoomDescription" => chat_description}
+      ) do
+    PublicChat.chat_owner(chat_uuid, user.id)
+    |> case do
+      false ->
+        conn |> send_resp(400, "")
+
+      true ->
+        from(PublicChat,
+          where: [uuid: ^chat_uuid],
+          update: [set: [description: ^chat_description, created: true]]
+        )
+        |> Repo.update_all([])
+
+        conn |> send_resp(200, "")
+    end
   end
 end

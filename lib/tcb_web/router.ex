@@ -40,6 +40,9 @@ defmodule TcbWeb.Router do
     pipe_through :authorized_api
 
     post "/public-chat-room/create", PublicChatController, :create
+    get "/chat-owner/:uuid", PublicChatController, :chat_owner
+    put "/public-chat-room/edit-hashtag", PublicChatController, :put_hashtags
+    put "/public-chat-room/edit-description", PublicChatController, :put_description
   end
 
   scope "/api", TcbWeb do
