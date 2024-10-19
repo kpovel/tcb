@@ -33,6 +33,7 @@ defmodule TcbWeb.Router do
 
     live_session :chat, layout: false do
       live "/all", ChatLive
+      live "/:chat_uuid", ChatRoomLive
     end
   end
 
