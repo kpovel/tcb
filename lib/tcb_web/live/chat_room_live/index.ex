@@ -15,15 +15,20 @@ defmodule TcbWeb.ChatRoomLive do
           no messages here
         </div>
       <% end %>
-      <div id="messages" phx-update="stream" class="grow overflow-scroll">
+      <div
+        id="messages"
+        phx-update="stream"
+        class="grow overflow-scroll"
+        phx-viewport-top="load_previous_messages"
+      >
         <%= for {dom_id, message} <- @streams.messages do %>
           <div id={dom_id}>
             <%= message.message %>
           </div>
         <% end %>
       </div>
-      <.form phx-submit="send_message" for={@form} class="">
-        <.input name="message" value="" class="grow w-full" />
+      <.form phx-submit="send_message" phx-change="change" for={@form} class="">
+        <.input id="message-input" name="message" value={@form[:message]} class="grow w-full" />
         <button type="submit">
           submit
         </button>
@@ -50,7 +55,7 @@ defmodule TcbWeb.ChatRoomLive do
 
     {:ok,
      socket
-     |> assign(:form, %{})
+     |> assign(:form, %{message: ""})
      |> assign(:public_chat, public_chat)
      |> assign(:chat_member, chat_member)
      |> assign(:chat_uuid, chat_uuid)}
@@ -76,6 +81,14 @@ defmodule TcbWeb.ChatRoomLive do
      |> stream(:messages, messages)}
   end
 
+  def handle_event("change", %{"message" => message}, socket) do
+    {:noreply,
+     socket
+     |> Phoenix.Component.update(:form, fn form ->
+       Map.put(form, :message, message)
+     end)}
+  end
+
   def handle_event(
         "send_message",
         %{"message" => message},
@@ -94,7 +107,9 @@ defmodule TcbWeb.ChatRoomLive do
 
     Endpoint.broadcast("chat#{chat_uuid}", "send_message", message)
 
-    {:noreply, socket}
+    {:noreply,
+     socket
+     |> assign(:form, %{message: ""})}
   end
 
   def handle_info(%{event: "send_message", payload: message}, socket) do
