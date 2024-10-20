@@ -23,6 +23,7 @@ defmodule Tcb.Repo.Migrations.PublicChat do
 
     create table(:chat_messages) do
       add :chat_member_id, references(:chat_members), null: false
+      add :public_chat_id, references(:public_chats), null: false
       add :message, :string, null: false
 
       timestamps(type: :utc_datetime)

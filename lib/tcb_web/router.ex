@@ -9,6 +9,15 @@ defmodule TcbWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug TcbWeb.Plugs.RemoveXFrameOptions
+    plug TcbWeb.Plugs.Lang, "en"
+  end
+
+  pipeline :authorized_only do
+    plug TcbWeb.Plugs.AuthorizedOnly
+  end
+
+  pipeline :chat_user do
+    plug TcbWeb.Plugs.ChatUser
   end
 
   pipeline :api do
@@ -29,9 +38,9 @@ defmodule TcbWeb.Router do
   end
 
   scope "/chat", TcbWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :authorized_only]
 
-    live_session :chat, layout: false do
+    live_session :chat, layout: false, on_mount: [{TcbWeb.UserAuth, :assign_chat_user}] do
       live "/all", ChatLive
       live "/:chat_uuid", ChatRoomLive
     end
