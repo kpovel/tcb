@@ -32,69 +32,67 @@ defmodule TcbWeb.ChatRoomLive do
     """
   end
 
-  def mount(%{"chat_uuid" => chat_uuid} = params, session, socket) do
+  def mount(%{"chat_uuid" => chat_uuid} = _params, %{"user_id" => user_id} = _session, socket) do
     if LiveView.connected?(socket), do: Endpoint.subscribe("chat" <> chat_uuid)
-    # IO.inspect(params, structs: false, label: "params!!!!!!!!!")
-    # IO.inspect(socket, structs: false, label: "mount socket")
-    # IO.inspect(session, structs: false, label: "session how")
+
+    public_chat =
+      from(pc in Tcb.Chat.PublicChat,
+        where: pc.uuid == ^chat_uuid
+      )
+      |> Repo.one!()
+
+    # todo: if null ask to join the chat
+    chat_member =
+      from(cm in Tcb.Chat.ChatMembers,
+        where: cm.user_id == ^user_id and cm.chat_id == ^public_chat.id
+      )
+      |> Repo.one()
 
     {:ok,
      socket
      |> assign(:form, %{})
-     |> assign(:form, %{})
+     |> assign(:public_chat, public_chat)
+     |> assign(:chat_member, chat_member)
      |> assign(:chat_uuid, chat_uuid)}
   end
 
-  def handle_params(_params, _uri, socket) do
-    # IO.inspect(socket, label: "socket!!!!!!!!")
+  def handle_params(
+        _params,
+        _uri,
+        %{assigns: %{public_chat: %Tcb.Chat.PublicChat{} = chat}} = socket
+      ) do
+    messages =
+      from(ChatMessages,
+        where: [public_chat_id: ^chat.id],
+        select: [:id, :message, :chat_member_id, :inserted_at],
+        order_by: [desc: :id],
+        limit: 25
+      )
+      |> Repo.all()
+      |> Enum.reverse()
 
-    # public_chat =
-    #   from(pc in Tcb.Chat.PublicChat,
-    #     where: pc.uuid == ^chat_uuid
-    #   )
-    #   |> Repo.one!()
-    #
-    #
-    # chat_member =
-    #   from(cm in Tcb.Chat.ChatMembers,
-    #     where: cm.user_id == ^user.id and cm.chat_id == ^public_chat.id
-    #   )
-    #   |> Repo.one()
-    #
-    #
-    # from(ChatMessages,
-    #   where: [public_chat_id: ^socket.public_chat.id],
-    #   select: [:id],
-    #   limit: 25
-    # )
-    # |> Repo.all()
-    # |> IO.inspect(label: "chat messages")
-
-    # todo: last 25 messages
     {:noreply,
      socket
-     # |> assign(:public_chat, public_chat)
-     # |> assign(:chat_member, chat_member)
-     |> stream(:messages, [
-       %{id: 1, message: "foo"},
-       %{id: 2, message: "bar"},
-       %{id: 3, message: "baz"}
-     ])}
+     |> stream(:messages, messages)}
   end
 
-  def handle_event("send_message", %{"message" => message}, socket) do
+  def handle_event(
+        "send_message",
+        %{"message" => message},
+        %{assigns: %{chat_member: %Tcb.Chat.ChatMembers{id: chat_member_id, chat_id: chat_id}}} =
+          socket
+      ) do
     chat_uuid = socket.assigns.chat_uuid
 
-    %ChatMessages{
-      chat_member: 69,
-      message: message
-    }
-    |> Repo.insert!()
+    message =
+      %ChatMessages{
+        chat_member_id: chat_member_id,
+        public_chat_id: chat_id,
+        message: message
+      }
+      |> Repo.insert!()
 
-    Endpoint.broadcast("chat#{chat_uuid}", "send_message", %{
-      id: :rand.uniform(),
-      message: message
-    })
+    Endpoint.broadcast("chat#{chat_uuid}", "send_message", message)
 
     {:noreply, socket}
   end

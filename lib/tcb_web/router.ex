@@ -36,7 +36,7 @@ defmodule TcbWeb.Router do
   scope "/chat", TcbWeb do
     pipe_through [:browser, :authorized_only]
 
-    live_session :chat, layout: false, on_mount: [{TcbWeb.UserAuth, :assign_chat_user}] do
+    live_session :chat, layout: false do
       live "/all", ChatLive
       live "/:chat_uuid", ChatRoomLive
     end

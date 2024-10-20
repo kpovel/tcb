@@ -10,9 +10,15 @@ defmodule TcbWeb.Plugs.AuthorizedOnly do
       {true, access_token_id} ->
         user = Tcb.AccessToken.user_by_access_token_id(access_token_id)
 
-        conn
-        |> put_session(:user_id, user.id)
-        |> put_session(:access_token, token)
+        case Map.get(conn.private, :plug_session) do
+          nil ->
+            conn
+
+          _ ->
+            conn
+            |> put_session(:user_id, user.id)
+            |> put_session(:access_token, token)
+        end
         |> assign(:user, user)
 
       false ->
