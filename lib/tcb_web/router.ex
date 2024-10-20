@@ -16,10 +16,6 @@ defmodule TcbWeb.Router do
     plug TcbWeb.Plugs.AuthorizedOnly
   end
 
-  pipeline :chat_user do
-    plug TcbWeb.Plugs.ChatUser
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
     plug TcbWeb.Plugs.Lang, "en"
