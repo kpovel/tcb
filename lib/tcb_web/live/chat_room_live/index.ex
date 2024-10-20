@@ -10,6 +10,7 @@ defmodule TcbWeb.ChatRoomLive do
   def render(assigns) do
     ~H"""
     <div class="flex flex-col h-dvh">
+      <div>header</div>
       <%= if Enum.count(@streams.messages) == 0 do %>
         <div>
           no messages here
@@ -22,13 +23,22 @@ defmodule TcbWeb.ChatRoomLive do
         phx-viewport-top="load_previous_messages"
       >
         <%= for {dom_id, message} <- @streams.messages do %>
-          <div id={dom_id}>
+          <div id={dom_id} class="border p-2">
             <%= message.message %>
+            <span class="text-blue-300">
+              message id: <%= message.id %>
+            </span>
           </div>
         <% end %>
       </div>
       <.form phx-submit="send_message" phx-change="change" for={@form} class="">
-        <.input id="message-input" name="message" value={@form[:message]} class="grow w-full" />
+        <.input
+          id="message-input"
+          name="message"
+          value={@form[:message]}
+          class="grow w-full"
+          required
+        />
         <button type="submit">
           submit
         </button>
@@ -112,7 +122,34 @@ defmodule TcbWeb.ChatRoomLive do
      |> assign(:form, %{message: ""})}
   end
 
+  def handle_event(
+        "load_previous_messages",
+        %{"id" => "messages-" <> last_message_id},
+        %{assigns: %{public_chat: %Tcb.Chat.PublicChat{} = chat}} = socket
+      ) do
+    messages =
+      from(cm in ChatMessages,
+        where: cm.public_chat_id == ^chat.id and cm.id < ^last_message_id,
+        select: [:id, :message, :chat_member_id, :inserted_at],
+        order_by: [desc: :id],
+        limit: 25
+      )
+      |> Repo.all()
+
+    {
+      :noreply,
+      socket |> stream_insert_batch(:messages, messages, at: 0)
+    }
+  end
+
   def handle_info(%{event: "send_message", payload: message}, socket) do
     {:noreply, socket |> stream_insert(:messages, message)}
+  end
+
+  defp stream_insert_batch(socket, key, items, opts) do
+    items
+    |> Enum.reduce(socket, fn item, socket ->
+      stream_insert(socket, key, item, opts)
+    end)
   end
 end
